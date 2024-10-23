@@ -13,44 +13,59 @@ static TBitField FAKE_BITFIELD(1);
 
 TBitField::TBitField(int len)
 {
+    MemLen = (len + 31) / 32;
+    pMem = new unsigned int[MemLen];
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = 0;
+    }
 }
 
 TBitField::TBitField(const TBitField &bf) // конструктор копирования
 {
+    MemLen = bf.MemLen;
+    pMem = new unsigned int[MemLen];
+    for (int i = 0; i < MemLen; i++) {
+        pMem[i] = bf.pMem[i];
+    }
 }
 
 TBitField::~TBitField()
 {
+    delete[] pMem;
 }
 
 int TBitField::GetMemIndex(const int n) const // индекс Мем для бита n
 {
-    return FAKE_INT;
+    return n / 32;
 }
 
 TELEM TBitField::GetMemMask(const int n) const // битовая маска для бита n
 {
-    return FAKE_INT;
+    return 1 << (n % 32);;
 }
 
 // доступ к битам битового поля
 
 int TBitField::GetLength(void) const // получить длину (к-во битов)
 {
-  return FAKE_INT;
+  return BitLen;
 }
 
 void TBitField::SetBit(const int n) // установить бит
 {
+    pMem[GetMemIndex(n)] |= GetMemMask(n);
+
 }
 
 void TBitField::ClrBit(const int n) // очистить бит
 {
+    pMem[GetMemIndex(n)] &= ~GetMemMask(n);
+
 }
 
 int TBitField::GetBit(const int n) const // получить значение бита
 {
-  return FAKE_INT;
+    return (pMem[GetMemIndex(n)] & GetMemMask(n)) != 0;
 }
 
 // битовые операции
@@ -72,17 +87,30 @@ int TBitField::operator!=(const TBitField &bf) const // сравнение
 
 TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 {
-    return FAKE_BITFIELD;
+    for (int i = 0; i < MemLen; i++) {
+        if (pMem[i] != bf.pMem[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 {
-    return FAKE_BITFIELD;
+    TBitField result(BitLen);
+    for (int i = 0; i < MemLen; i++) {
+        result.pMem[i] = pMem[i] & bf.pMem[i];
+    }
+    return result;
 }
 
 TBitField TBitField::operator~(void) // отрицание
 {
-    return FAKE_BITFIELD;
+    TBitField result(BitLen);
+    for (int i = 0; i < MemLen; i++) {
+        result.pMem[i] = ~pMem[i];
+    }
+    return result;
 }
 
 // ввод/вывод
