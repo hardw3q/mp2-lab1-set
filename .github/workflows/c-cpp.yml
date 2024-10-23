@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2  # Проверка кода из репозитория
+      uses: actions/checkout@latest  # Проверка кода из репозитория
 
     - name: Set up CMake
-      uses: lukka/get-cmake@v3  # Установка CMake
+      uses: lukka/get-cmake@latest  # Установка CMake
 
     - name: Install dependencies
       run: sudo apt-get install -y build-essential cmake libgtest-dev
